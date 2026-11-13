@@ -87,7 +87,17 @@ function toast(msg, bad) {
   clearTimeout(toast.t); toast.t = setTimeout(() => (t.className = ""), 3500);
 }
 
+// The database only answers allowlisted Discord accounts, so everyone else just gets the login screen.
+function renderGate() {
+  $("round").textContent = ""; $("upd").style.display = "none"; $("tabs").innerHTML = "";
+  $("view").innerHTML = loggedIn
+    ? `<p class="bad">Your Discord account is not on the entry list. Ask the organizer to add your Discord ID.</p>`
+    : `<div class="box"><h2>Private contest</h2><p class="dim" style="margin:0 0 12px">Log in with Discord to see teams and scores.</p><button class="primary" onclick="$('auth').click()">Log in with Discord</button></div>`;
+}
+
 async function load() {
+  if (!me.allowed) return renderGate();
+  $("upd").style.display = "";
   const res = await Promise.all(TABLES.map((t) => sb.from(t).select("*")));
   const err = res.find((r) => r.error);
   if (err) return toast(err.error.message, true);
