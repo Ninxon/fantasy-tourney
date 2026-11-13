@@ -112,11 +112,12 @@ async function loadMe() {
   const { data: { session } } = await sb.auth.getSession();
   loggedIn = !!session;
   const meta = session && session.user.user_metadata;
-  $("who").textContent = meta ? meta.full_name || meta.name || "" : "";
+  $("who").textContent = meta ? meta.global_name || meta.username || meta.full_name || meta.name || "" : "";
   $("auth").textContent = session ? "Log out" : "Log in with Discord";
+  // custom:discord requests only the "identify" scope (no email), unlike Supabase's built-in Discord provider.
   $("auth").onclick = session
     ? () => sb.auth.signOut().then(() => location.reload())
-    : () => sb.auth.signInWithOAuth({ provider: "discord", options: { redirectTo: location.origin + location.pathname } });
+    : () => sb.auth.signInWithOAuth({ provider: "custom:discord", options: { redirectTo: location.origin + location.pathname } });
 }
 
 function scored() {
