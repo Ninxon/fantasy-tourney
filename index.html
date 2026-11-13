@@ -4,66 +4,132 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fantasy Siege Tourney</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #14121a; --panel: #1d1a26; --line: #2c2838; --text: #ece9f4; --dim: #8d88a0;
-    --accent: #f0b43c; --good: #5dd39e; --bad: #ef6a6a;
+    --deep: #0f0f10; --bg: #141415; --card: #19191b; --raised: #232325; --hover: #2a2a2d;
+    --line: rgba(237, 237, 237, 0.08);
+    --text: #ededed; --text-2: #a1a1a6; --muted: #85858b;
+    --ember: #f08a3c; --ember-hover: #f39a55; --on-ember: #1c1006;
+    --gold: #e8b84a; --silver: #b9bec7; --bronze: #c9844f;
+    --good: #4cc38a; --bad: #e5484d;
+    --mono: "Geist Mono", ui-monospace, monospace;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
     color-scheme: dark;
   }
-  @media (prefers-color-scheme: light) {
-    :root { --bg: #f6f4fa; --panel: #fff; --line: #e3dfee; --text: #1c1928; --dim: #6c6780; --accent: #b87a00; --good: #1f9d6b; --bad: #d64545; color-scheme: light; }
-  }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
-  main { max-width: 980px; margin: 0 auto; padding: 0 16px 64px; }
-  header { display: flex; align-items: center; gap: 12px; padding: 20px 0 12px; flex-wrap: wrap; }
-  h1 { font-size: 20px; margin: 0; letter-spacing: -.01em; }
-  .chip { font-size: 12px; padding: 2px 9px; border: 1px solid var(--line); border-radius: 99px; color: var(--dim); }
-  .live { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--good); margin-right: 6px; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/20px Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  main { max-width: 1040px; margin: 0 auto; padding: 0 24px 64px; }
+  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .dim { color: var(--text-2); } .muted { color: var(--muted); } .bad { color: var(--bad); } .good { color: var(--good); }
+
+  /* header */
+  header { height: 64px; display: flex; align-items: center; gap: 16px; }
+  .brand { font-size: 16px; font-weight: 600; }
+  .status { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); }
+  .dot.fresh { background: var(--good); }
   .spacer { flex: 1; }
-  nav { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 16px; overflow-x: auto; }
-  nav button { background: none; border: 0; color: var(--dim); padding: 10px 14px; cursor: pointer; font: inherit; border-bottom: 2px solid transparent; white-space: nowrap; border-radius: 0; }
-  nav button.on { color: var(--text); border-color: var(--accent); }
-  button, select, input { font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; }
-  button { cursor: pointer; }
-  button.primary { background: var(--accent); border-color: var(--accent); color: #1a1405; font-weight: 600; }
-  button:disabled { opacity: .5; cursor: default; }
+  #who { color: var(--text-2); }
+  nav { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 32px; overflow-x: auto; }
+  nav button { height: 40px; padding: 0 12px; margin-bottom: -1px; background: none; border: 0; border-bottom: 2px solid transparent; color: var(--text-2); font: inherit; font-weight: 500; cursor: pointer; white-space: nowrap; transition: color 150ms var(--ease), border-color 150ms var(--ease); }
+  nav button:hover { color: var(--text); }
+  nav button.on { color: var(--text); border-color: var(--ember); }
+  h1 { font-size: 28px; line-height: 32px; font-weight: 500; margin: 0 0 4px; }
+  .sub { color: var(--text-2); margin: 0 0 24px; }
+
+  /* controls */
+  button, select, input { font: inherit; color: var(--text); }
+  .btn { height: 36px; padding: 0 16px; border-radius: 8px; border: 1px solid var(--line); background: var(--raised); cursor: pointer; white-space: nowrap; transition: background-color 150ms var(--ease), color 150ms var(--ease), transform 120ms var(--ease); }
+  .btn:hover { background: var(--hover); }
+  .btn:active { transform: scale(0.98); }
+  .btn.primary { background: var(--ember); border-color: var(--ember); color: var(--on-ember); font-weight: 500; }
+  .btn.primary:hover { background: var(--ember-hover); }
+  .btn.quiet { background: none; border-color: transparent; color: var(--text-2); }
+  .btn.quiet:hover { background: var(--raised); color: var(--text); }
+  .icon-btn { width: 28px; height: 28px; display: inline-grid; place-items: center; border: 0; border-radius: 6px; background: none; color: var(--muted); cursor: pointer; transition: background-color 150ms var(--ease), color 150ms var(--ease); }
+  .icon-btn:hover { background: var(--raised); color: var(--text); }
+  input, select { height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--deep); }
+  input[type=checkbox] { width: 16px; height: 16px; padding: 0; accent-color: var(--ember); }
+  label.check { display: inline-flex; align-items: center; gap: 8px; height: 36px; color: var(--text-2); cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
+  svg.i { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* leaderboard: the one moment */
+  .t1 { color: var(--gold); } .t2 { color: var(--silver); } .t3 { color: var(--bronze); }
+  .podium { display: grid; grid-template-columns: 1fr 1.15fr 1fr; gap: 16px; align-items: end; margin-bottom: 32px; }
+  .podium.n1 { grid-template-columns: minmax(0, 400px); }
+  .podium.n2 { grid-template-columns: 1fr 1fr; }
+  .pod { display: flex; flex-direction: column; gap: 16px; padding: 20px; border-radius: 16px; border: 1px solid var(--line); background: var(--card); }
+  .pod.p1 { padding-top: 32px; background: linear-gradient(#1f1c16, var(--card) 60%); border-color: rgba(232, 184, 74, 0.28); }
+  .pod-head { display: flex; align-items: center; justify-content: space-between; }
+  .pod-head svg.i { width: 28px; height: 28px; stroke-width: 1.5; }
+  .pod.p1 .pod-head svg.i { width: 36px; height: 36px; }
+  .place { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .pod-name { font-size: 16px; line-height: 24px; font-weight: 500; }
+  .pts { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 32px; line-height: 1; font-weight: 500; }
+  .pod.p1 .pts { font-size: 40px; }
+  .pts small { margin-left: 4px; font-size: 12px; font-weight: 400; color: var(--muted); }
+  .split { display: flex; gap: 2px; height: 6px; border-radius: 3px; overflow: hidden; background: var(--raised); }
+  .legend { display: grid; gap: 4px; font-size: 13px; color: var(--text-2); }
+  .legend div { display: grid; grid-template-columns: 8px 1fr auto; align-items: center; gap: 8px; }
+  .sw { width: 8px; height: 8px; border-radius: 2px; }
+
+  /* tables */
   table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-  th, td { text-align: left; padding: 9px 8px; border-bottom: 1px solid var(--line); }
-  th { color: var(--dim); font-weight: 500; font-size: 12px; }
-  td.n, th.n { text-align: right; }
-  .rank { color: var(--dim); width: 28px; }
-  .total { font-weight: 700; }
-  .roster span { display: inline-block; margin: 0 6px 2px 0; padding: 1px 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; font-size: 13px; }
-  .roster b { color: var(--accent); font-weight: 600; margin-left: 4px; }
-  .box { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
-  .box h2 { font-size: 14px; margin: 0 0 12px; }
-  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
-  .pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 6px; margin-bottom: 12px; }
-  .pick label { display: flex; justify-content: space-between; gap: 6px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
-  .pick label.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
-  .pick input { display: none; }
-  .dim { color: var(--dim); }
-  .bad { color: var(--bad); } .good { color: var(--good); }
-  #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--line); padding: 10px 16px; border-radius: 10px; opacity: 0; transition: opacity .2s; pointer-events: none; max-width: 90vw; }
-  #toast.show { opacity: 1; }
-  @media (max-width: 640px) { .hide-s { display: none; } }
+  th { padding: 0 12px 8px; text-align: left; font-size: 12px; font-weight: 400; color: var(--muted); }
+  td { height: 48px; padding: 0 12px; border-top: 1px solid var(--line); }
+  th.n, td.n { text-align: right; }
+  td.n { font-family: var(--mono); }
+  .rank { width: 48px; }
+  td.rank svg.i { width: 20px; height: 20px; display: block; }
+  .total { font-weight: 500; color: var(--text); }
+  tr.top td { height: 52px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .chips span { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 8px; border-radius: 6px; background: var(--raised); font-size: 12px; color: var(--text-2); }
+  .chips b { font-family: var(--mono); font-weight: 500; color: var(--text); }
+
+  /* cards and forms */
+  .card { padding: 20px; margin-bottom: 16px; border-radius: 16px; border: 1px solid var(--line); background: var(--card); }
+  .card h2 { display: flex; justify-content: space-between; margin: 0 0 16px; font-size: 14px; font-weight: 500; }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .row + .row, .row + table, .row + p, table + .row { margin-top: 12px; }
+  .note { margin: 12px 0 0; font-size: 13px; color: var(--muted); }
+  .figure { font-family: var(--mono); font-size: 20px; line-height: 28px; font-weight: 500; margin-right: 8px; }
+  .pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px; margin-bottom: 16px; }
+  .pick label { height: 40px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line); cursor: pointer; transition: background-color 150ms var(--ease), border-color 150ms var(--ease); }
+  .pick label:hover { background: var(--raised); }
+  .pick label.on { border-color: var(--ember); background: rgba(240, 138, 60, 0.1); }
+  .empty { padding: 64px 0; text-align: center; color: var(--muted); }
+  .gate { max-width: 400px; margin: 96px auto; text-align: center; }
+  #toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 8px); max-width: calc(100vw - 32px); padding: 10px 16px; border-radius: 10px; border: 1px solid var(--line); background: var(--raised); opacity: 0; pointer-events: none; transition: opacity 200ms var(--ease), transform 200ms var(--ease); }
+  #toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (max-width: 720px) {
+    main { padding: 0 16px 48px; }
+    h1 { font-size: 24px; }
+    .hide-s { display: none; }
+    .podium, .podium.n2 { grid-template-columns: 1fr; }
+    .pod.p1 { order: -1; }
+    td, th { padding-left: 8px; padding-right: 8px; }
+  }
 </style>
 </head>
 <body>
 <main>
   <header>
-    <h1>Fantasy Siege Tourney</h1>
-    <span class="chip" id="round"></span>
-    <span class="chip" id="upd"><span class="live"></span>live</span>
+    <span class="brand">Fantasy Siege Tourney</span>
+    <span id="status" class="status"></span>
     <span class="spacer"></span>
-    <span id="who" class="dim"></span>
-    <button id="auth"></button>
+    <span id="who" class="hide-s"></span>
+    <button id="auth" class="btn quiet"></button>
   </header>
   <nav id="tabs"></nav>
   <section id="view"></section>
 </main>
-<div id="toast"></div>
+<div id="toast" role="status"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="config.js"></script>
@@ -75,51 +141,69 @@ const sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY, 
 });
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const TABLES = ["players", "rounds", "teams", "roster_history", "bonuses", "settings", "wizard_map", "round_swaps"];
+const ICON = {
+  trophy: '<svg class="i" viewBox="0 0 24 24"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
+  x: '<svg class="i" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+};
+const PLACES = ["1st", "2nd", "3rd"];
+const SPLIT = ["var(--ember)", "#5c5c61", "#47474b", "#343437"]; // the top scorer of a team in ember, the rest in neutral steps
+const SCOPED = ["teams", "roster_history", "rounds", "bonuses", "round_swaps"]; // per season
+const GLOBAL = ["players", "wizard_map"];
 
-let D = { players: [], rounds: [], teams: [], roster_history: [], bonuses: [], settings: { current_round: 1 }, wizard_map: [], round_swaps: [] };
-let me = { allowed: false, admin: false, owner: null };
+let D = { settings: null, players: [], wizard_map: [], teams: [], roster_history: [], rounds: [], bonuses: [], round_swaps: [] };
+let me = { allowed: false, admin: false, owner: null, id: null };
 let loggedIn = false;
 let tab = "teams";
-let picked = new Set();
+let season = null;
+let picked = null;
 let allowedUsers = [];
 
 function toast(msg, bad) {
   const t = $("toast");
   t.textContent = msg; t.className = "show " + (bad ? "bad" : "");
-  clearTimeout(toast.t); toast.t = setTimeout(() => (t.className = ""), 3500);
+  clearTimeout(toast.t); toast.t = setTimeout(() => (t.className = ""), 4000);
 }
+const login = () => sb.auth.signInWithOAuth({ provider: "custom:discord", options: { redirectTo: location.origin + location.pathname } });
+const isCur = () => D.settings && season === D.settings.current_season;
+const viewRound = () => isCur() ? D.settings.current_round : Math.max(1, ...D.rounds.map((r) => r.round_no));
+const seasonLabel = () => `Season ${season} · Round ${viewRound()}`;
+const costOf = (n) => (D.players.find((p) => p.name === n) || {}).cost || 0;
+const clock = (t) => new Date(t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
-// The database only answers allowlisted Discord accounts, so everyone else just gets the login screen.
+// The database only answers allowlisted Discord accounts, so everyone else just gets this screen.
 function renderGate() {
-  $("round").textContent = ""; $("upd").style.display = "none"; $("tabs").innerHTML = "";
+  $("status").innerHTML = ""; $("tabs").innerHTML = "";
   $("view").innerHTML = loggedIn
-    ? `<p class="bad">Your Discord account is not on the entry list. Ask the organizer to add your Discord ID.</p>`
-    : `<div class="box"><h2>Private contest</h2><p class="dim" style="margin:0 0 12px">Log in with Discord to see teams and scores.</p><button class="primary" onclick="$('auth').click()">Log in with Discord</button></div>`;
+    ? `<div class="gate"><h1>Not on the entry list</h1><p class="sub">Ask the organizer to add your Discord account</p></div>`
+    : `<div class="gate"><h1>Private contest</h1><p class="sub">Log in with Discord to see teams and scores</p><button class="btn primary" id="gate-login">Log in with Discord</button></div>`;
+  if ($("gate-login")) $("gate-login").onclick = login;
 }
 
 async function load() {
   if (!me.allowed) return renderGate();
-  $("upd").style.display = "";
-  const res = await Promise.all(TABLES.map((t) => sb.from(t).select("*")));
+  const st = await sb.from("settings").select("*").single();
+  if (st.error) return toast(st.error.message, true);
+  D.settings = st.data;
+  if (season == null || season > D.settings.current_season) season = D.settings.current_season;
+  const res = await Promise.all([
+    ...SCOPED.map((t) => sb.from(t).select("*").eq("season", season)),
+    ...GLOBAL.map((t) => sb.from(t).select("*")),
+  ]);
   const err = res.find((r) => r.error);
   if (err) return toast(err.error.message, true);
-  TABLES.forEach((t, i) => (D[t] = t === "settings" ? res[i].data[0] : res[i].data));
+  [...SCOPED, ...GLOBAL].forEach((t, i) => (D[t] = res[i].data));
   if (me.admin) { const r = await sb.from("allowed_users").select("*").order("label"); allowedUsers = r.data || []; }
   render();
 }
 
 async function loadMe(session) {
   const { data } = await sb.rpc("whoami");
-  me = data || { allowed: false, admin: false, owner: null };
+  me = data || { allowed: false, admin: false, owner: null, id: null };
   loggedIn = !!session;
   const meta = session && session.user.user_metadata;
-  $("who").textContent = meta ? meta.global_name || meta.username || meta.full_name || meta.name || "" : "";
-  $("auth").textContent = session ? "Log out" : "Log in with Discord";
-  // custom:discord requests only the "identify" scope (no email), unlike Supabase's built-in Discord provider.
-  $("auth").onclick = session
-    ? () => sb.auth.signOut().then(() => location.reload())
-    : () => sb.auth.signInWithOAuth({ provider: "custom:discord", options: { redirectTo: location.origin + location.pathname } });
+  $("who").textContent = meta ? meta.name || meta.preferred_username || meta.full_name || "" : "";
+  $("auth").textContent = session ? "Log out" : "Log in";
+  $("auth").onclick = session ? () => sb.auth.signOut().then(() => location.reload()) : login;
 }
 
 function scored() {
@@ -128,77 +212,115 @@ function scored() {
   const byTeam = {};
   for (const h of D.roster_history) (byTeam[h.discord_id] ||= []).push(h);
   return Scoring.scoreAll({
-    players: D.players, rounds, bonuses: D.bonuses, currentRound: D.settings.current_round,
+    players: D.players, rounds, bonuses: D.bonuses, currentRound: viewRound(),
     wizardMap: Object.fromEntries(D.wizard_map.map((m) => [m.wizard_id, m.player])), swaps: D.round_swaps,
     teams: D.teams.map((t) => ({ owner: t.owner, history: byTeam[t.discord_id] || [] })),
   });
 }
 
-const tabsFor = () => [["teams", "Teams"], ["players", "Players"], ["me", "My team"], ...(me.admin ? [["admin", "Admin"]] : [])];
+const TABS = () => [["teams", "Leaderboard"], ["players", "Players"], ["me", "My team"], ...(me.admin ? [["admin", "Admin"]] : [])];
 
 function render() {
   const s = D.settings;
-  const status = s.registration_open ? "registration open" : s.trading_open ? "trading open" : "";
-  $("round").textContent = `Round ${s.current_round}${status ? " · " + status : ""}`;
   const last = D.rounds.map((r) => r.updated_at).sort().pop();
-  $("upd").innerHTML = `<span class="live"></span>${last ? "updated " + new Date(last).toLocaleTimeString() : "waiting for data"}`;
-  $("tabs").innerHTML = tabsFor().map(([k, l]) => `<button data-t="${k}" class="${k === tab ? "on" : ""}">${l}</button>`).join("");
+  const fresh = last && Date.now() - new Date(last) < 15 * 60e3;
+  const seasons = Array.from({ length: s.current_season }, (_, i) => s.current_season - i);
+  $("status").innerHTML =
+    (s.current_season > 1 ? `<select id="season" aria-label="Season">${seasons.map((n) => `<option value="${n}" ${n === season ? "selected" : ""}>Season ${n}</option>`).join("")}</select>` : "") +
+    `<span class="dot ${fresh ? "fresh" : ""}"></span>${last ? "Updated " + clock(last) : "No data yet"}`;
+  if ($("season")) $("season").onchange = (e) => { season = +e.target.value; picked = null; load(); };
+  $("tabs").innerHTML = TABS().map(([k, l]) => `<button data-t="${k}" class="${k === tab ? "on" : ""}">${l}</button>`).join("");
   $("tabs").onclick = (e) => { if (e.target.dataset.t) { tab = e.target.dataset.t; render(); } };
-  const R = scored();
-  $("view").innerHTML = { teams: viewTeams, players: viewPlayers, me: viewMe, admin: viewAdmin }[tab](R);
+  $("view").innerHTML = { teams: viewTeams, players: viewPlayers, me: viewMe, admin: viewAdmin }[tab](scored());
   if (tab === "me") bindMe();
   if (tab === "admin") bindAdmin();
 }
 
+// ---------- leaderboard ----------
+function split(t) {
+  const ps = t.roster.map((p) => [p, t.playerPts[p] || 0]).sort((a, b) => b[1] - a[1]);
+  const sum = ps.reduce((s, x) => s + x[1], 0);
+  return `<div class="split">${ps.map(([, v], i) => `<i style="flex:${sum ? v : 1};background:${SPLIT[i]}"></i>`).join("")}</div>
+    <div class="legend">${ps.map(([p, v], i) => `<div><span class="sw" style="background:${SPLIT[i]}"></span><span>${esc(p)}</span><span class="num">${v}</span></div>`).join("")}</div>`;
+}
+
 function viewTeams(R) {
-  if (!R.teams.length) return `<p class="dim">No teams yet.</p>`;
-  return `<table><tr><th></th><th>Team</th><th>Roster</th><th class="n hide-s">Cost</th><th class="n">Points</th></tr>` +
-    R.teams.map((t, i) => `<tr><td class="rank">${i + 1}</td><td>${esc(t.owner)}</td>
-      <td class="roster">${t.roster.map((p) => `<span>${esc(p)}<b>${t.playerPts[p] || 0}</b></span>`).join("")}</td>
-      <td class="n hide-s dim">${t.cost}</td><td class="n total">${t.total}</td></tr>`).join("") + `</table>`;
+  const n = R.teams.length;
+  const head = `<h1>Leaderboard</h1><p class="sub">${seasonLabel()} · ${n} ${n === 1 ? "team" : "teams"}</p>`;
+  if (!n) return head + `<div class="empty">No teams yet${isCur() && D.settings.registration_open ? " · registration is open" : ""}</div>`;
+  const top = R.teams.slice(0, 3);
+  const pod = (t, i) => `<div class="pod p${i + 1}">
+      <div class="pod-head"><span class="t${i + 1}">${ICON.trophy}</span><span class="place">${PLACES[i]}</span></div>
+      <div><div class="pod-name">${esc(t.owner)}</div><div class="num muted" style="font-size:12px">${t.cost} cost</div></div>
+      <div class="pts">${t.total}<small>pts</small></div>
+      ${split(t)}
+    </div>`;
+  const order = top.length === 3 ? [1, 0, 2] : top.map((_, i) => i); // podium reads 2nd · 1st · 3rd
+  let html = head + `<div class="podium n${top.length}">${order.map((i) => pod(top[i], i)).join("")}</div>`;
+  const rest = R.teams.slice(3);
+  if (rest.length) {
+    html += `<table><tr><th class="rank">#</th><th>Team</th><th class="hide-s">Roster</th><th class="n hide-s">Cost</th><th class="n">Points</th></tr>` +
+      rest.map((t, i) => `<tr><td class="rank num muted">${i + 4}</td><td>${esc(t.owner)}</td>
+        <td class="hide-s"><div class="chips">${t.roster.map((p) => `<span>${esc(p)}<b>${t.playerPts[p] || 0}</b></span>`).join("")}</div></td>
+        <td class="n muted hide-s">${t.cost}</td><td class="n total">${t.total}</td></tr>`).join("") + `</table>`;
+  }
+  return html;
 }
 
 function viewPlayers(R) {
-  return `<table><tr><th></th><th>Player</th><th class="n hide-s">Cost</th><th class="n">Off</th><th class="n">Def</th><th class="n hide-s">Offense</th><th class="n hide-s">Defense</th><th class="n hide-s">Bonus</th><th class="n">Points</th></tr>` +
-    R.players.map((p, i) => `<tr><td class="rank">${i + 1}</td><td>${esc(p.name)}</td><td class="n hide-s dim">${p.cost}</td>
-      <td class="n">${p.offW}-${p.offL}</td><td class="n">${p.defW}-${p.defL}</td>
-      <td class="n hide-s">${p.offense}</td><td class="n hide-s">${p.defense}</td><td class="n hide-s">${p.bonus}</td><td class="n total">${p.total}</td></tr>`).join("") + `</table>`;
+  return `<h1>Players</h1><p class="sub">${seasonLabel()} · points across all rounds</p>
+    <table><tr><th class="rank">#</th><th>Player</th><th class="n hide-s">Cost</th><th class="n">Offense</th><th class="n">Defense</th><th class="n hide-s">Off pts</th><th class="n hide-s">Def pts</th><th class="n hide-s">Bonus</th><th class="n">Points</th></tr>` +
+    R.players.map((p, i) => `<tr class="${i < 3 && p.total ? "top" : ""}">
+      <td class="rank">${i < 3 && p.total ? `<span class="t${i + 1}">${ICON.trophy}</span>` : `<span class="num muted">${i + 1}</span>`}</td>
+      <td>${esc(p.name)}</td><td class="n muted hide-s">${p.cost}</td>
+      <td class="n dim">${p.offW}-${p.offL}</td><td class="n dim">${p.defW}-${p.defL}</td>
+      <td class="n hide-s dim">${p.offense}</td><td class="n hide-s dim">${p.defense}</td><td class="n hide-s dim">${p.bonus}</td>
+      <td class="n total">${p.total}</td></tr>`).join("") + `</table>`;
+}
+
+// ---------- my team ----------
+function myRoster() {
+  const mine = D.teams.find((t) => t.discord_id === me.id);
+  return mine ? Scoring.rosterForRound({ history: D.roster_history.filter((h) => h.discord_id === mine.discord_id) }, viewRound()) : [];
 }
 
 function viewMe() {
-  if (!loggedIn) return `<p class="dim">Log in with Discord to enter.</p>`;
-  if (!me.allowed) return `<p class="bad">Your Discord account is not on the entry list. Ask the organizer to add your Discord ID.</p>`;
+  const head = `<h1>My team</h1><p class="sub">${seasonLabel()}</p>`;
   const s = D.settings;
-  const mine = D.teams.find((t) => t.owner === me.owner);
-  const cur = mine ? Scoring.rosterForRound({ history: D.roster_history.filter((h) => h.discord_id === mine.discord_id) }, s.current_round) : [];
-  let html = `<div class="box"><h2>Your team ${cur.length ? "" : '<span class="dim">— none yet</span>'}</h2>
-    <div class="roster">${cur.map((p) => `<span>${esc(p)}</span>`).join("")}</div></div>`;
+  const cur = myRoster();
+  const cost = cur.reduce((sum, p) => sum + costOf(p), 0);
+  let html = head + `<div class="card"><h2>Your team${cur.length ? `<span class="num muted">${cost} / 500</span>` : ""}</h2>` +
+    (cur.length ? `<div class="chips">${cur.map((p) => `<span>${esc(p)}<b>${costOf(p)}</b></span>`).join("")}</div>` : `<p class="muted" style="margin:0">No team yet</p>`) + `</div>`;
+  if (!isCur()) return html;
   if (s.registration_open) {
-    html += `<div class="box"><h2>Pick 4 players · <span id="spent">0</span> / 500</h2><div class="pick">` +
+    if (!picked) picked = new Set(cur);
+    html += `<div class="card"><h2>Pick 4 players<span class="num" id="spent"></span></h2><div class="pick">` +
       D.players.slice().sort((a, b) => b.cost - a.cost).map((p) =>
-        `<label data-p="${esc(p.name)}"><span>${esc(p.name)}</span><span class="dim">${p.cost}</span></label>`).join("") +
-      `</div><button class="primary" id="submit">Submit team</button></div>`;
+        `<label data-p="${esc(p.name)}"><span>${esc(p.name)}</span><span class="num muted">${p.cost}</span></label>`).join("") +
+      `</div><button class="btn primary" id="submit">${cur.length ? "Update team" : "Submit team"}</button></div>`;
   } else if (s.trading_open && cur.length) {
-    const opt = (list) => list.map((p) => `<option>${esc(p.name || p)}</option>`).join("");
-    html += `<div class="box"><h2>Trade — equal or lesser value</h2><div class="row">
-      <select id="tout">${opt(cur)}</select> → <select id="tin">${opt(D.players.filter((p) => !cur.includes(p.name)).sort((a, b) => b.cost - a.cost))}</select>
-      <button class="primary" id="trade">Trade</button></div></div>`;
-  } else html += `<p class="dim">Registration and trading are closed.</p>`;
+    const opt = (list) => list.map((p) => `<option value="${esc(p.name)}">${esc(p.name)} · ${p.cost}</option>`).join("");
+    html += `<div class="card"><h2>Trade one player</h2><div class="row">
+      <select id="tout">${opt(cur.map((n) => ({ name: n, cost: costOf(n) })))}</select><span class="muted">for</span>
+      <select id="tin">${opt(D.players.filter((p) => !cur.includes(p.name)).sort((a, b) => b.cost - a.cost))}</select>
+      <button class="btn primary" id="trade">Trade</button></div>
+      <p class="note">Equal or lesser value. The new player counts from round ${s.current_round}</p></div>`;
+  } else html += `<p class="muted">Registration and trading are closed</p>`;
   return html;
 }
 
 function bindMe() {
-  const cost = (n) => D.players.find((p) => p.name === n).cost;
   const sync = () => {
     document.querySelectorAll(".pick label").forEach((l) => l.classList.toggle("on", picked.has(l.dataset.p)));
-    if ($("spent")) $("spent").textContent = [...picked].reduce((s, n) => s + cost(n), 0);
+    const spent = [...picked].reduce((s, n) => s + costOf(n), 0);
+    if ($("spent")) { $("spent").textContent = `${picked.size} / 4 · ${spent} / 500`; $("spent").className = "num " + (spent > 500 ? "bad" : "muted"); }
   };
   document.querySelectorAll(".pick label").forEach((l) => l.onclick = () => {
     const n = l.dataset.p;
     if (picked.has(n)) picked.delete(n); else if (picked.size < 4) picked.add(n);
     sync();
   });
-  sync();
+  if (picked) sync();
   if ($("submit")) $("submit").onclick = () => rpc("submit_team", { p_roster: [...picked] }, "Team saved");
   if ($("trade")) $("trade").onclick = () => rpc("trade", { p_out: $("tout").value, p_in: $("tin").value }, "Trade done");
 }
@@ -206,69 +328,84 @@ function bindMe() {
 async function rpc(fn, args, ok) {
   const { error } = await sb.rpc(fn, args);
   if (error) return toast(error.message, true);
-  toast(ok); load();
+  toast(ok); picked = null; load();
 }
 
-// Look-alike characters folded before matching, for suggestions only (an admin confirms).
-function viewAccounts(R) {
-  const rounds = D.rounds.map((r) => r.round_no);
-  const rn = rounds.includes(D.settings.current_round) ? D.settings.current_round : Math.max(0, ...rounds);
-  const raw = (D.rounds.find((r) => r.round_no === rn) || {}).wizards || {};
+// ---------- admin ----------
+function viewAccounts() {
+  const rn = viewRound();
+  const round = D.rounds.find((r) => r.round_no === rn) || D.rounds.slice().sort((a, b) => b.round_no - a.round_no)[0];
+  const raw = (round || {}).wizards || {};
   const manual = Object.fromEntries(D.wizard_map.map((m) => [m.wizard_id, m.player]));
   const ids = Object.keys(raw);
-  if (!ids.length) return `<div class="box"><h2>In-game accounts</h2><p class="dim" style="margin:0">No siege data yet.</p></div>`;
+  if (!ids.length) return `<div class="card"><h2>In-game accounts</h2><p class="muted" style="margin:0">No siege data in this round yet</p></div>`;
   const first = Scoring.firstNames(Object.fromEntries(D.rounds.map((r) => [r.round_no, r])));
   const auto = (id) => { const r = Scoring.resolveRound({ [id]: raw[id] }, D.players, {}, [], undefined, first); return Object.keys(r.wizards)[0] || ""; };
   const rows = ids.map((id) => ({ id, rec: raw[id], player: manual[id] || auto(id), isManual: !!manual[id] }))
     .sort((a, b) => !!a.player - !!b.player || a.rec.name.localeCompare(b.rec.name));
   const unmatched = rows.filter((r) => !r.player).length;
-  return `<div class="box"><h2>In-game accounts · round ${rn} ${unmatched ? `<span class="bad">· ${unmatched} unmatched</span>` : ""}</h2><table>` +
+  return `<div class="card"><h2>In-game accounts · round ${round.round_no}${unmatched ? `<span class="bad">${unmatched} unmatched</span>` : ""}</h2><table>` +
     rows.map((r) => {
       const former = first[r.id] && first[r.id] !== r.rec.name ? first[r.id] : null;
       const sug = !r.player && Scoring.suggest(former || r.rec.name, D.players);
-      return `<tr><td>${esc(r.rec.name)}${former ? ` <span class="dim">formerly ${esc(former)}</span>` : ""}</td><td class="dim hide-s">${esc(r.id)}</td><td class="n">${r.rec.off.w}-${r.rec.off.l}</td><td class="n">${r.rec.def.w}-${r.rec.def.l}</td>
-        <td><select data-map="${esc(r.id)}"><option value="">${r.player ? "— (name match)" : "— unmatched"}</option>${D.players.map((p) =>
+      return `<tr><td>${esc(r.rec.name)}${former ? ` <span class="muted">formerly ${esc(former)}</span>` : ""}</td>
+        <td class="n hide-s muted">${esc(r.id)}</td><td class="n dim">${r.rec.off.w}-${r.rec.off.l}</td><td class="n dim">${r.rec.def.w}-${r.rec.def.l}</td>
+        <td><div class="row"><select data-map="${esc(r.id)}"><option value="">${r.player ? "Name match" : "Unmatched"}</option>${D.players.map((p) =>
           `<option ${r.isManual && p.name === r.player ? "selected" : ""}>${esc(p.name)}</option>`).join("")}</select>
-        ${!r.isManual && r.player ? `<span class="dim">→ ${esc(r.player)}</span>` : ""}
-        ${sug ? `<button data-sug="${esc(r.id)}" data-p="${esc(sug)}">${esc(sug)} ✓</button>` : ""}</td></tr>`;
+        ${!r.isManual && r.player ? `<span class="dim">${esc(r.player)}</span>` : ""}
+        ${sug ? `<button class="btn" data-sug="${esc(r.id)}" data-p="${esc(sug)}">Use ${esc(sug)}</button>` : ""}</div></td></tr>`;
     }).join("") + `</table></div>`;
 }
 
-function viewAdmin(R) {
+function viewAdmin() {
   const s = D.settings;
   const opts = D.players.map((p) => `<option>${esc(p.name)}</option>`).join("");
-  return `<div class="box"><h2>Contest</h2><div class="row">
-      Round <input id="a-round" type="number" min="1" value="${s.current_round}" style="width:80px">
-      <label><input id="a-reg" type="checkbox" ${s.registration_open ? "checked" : ""}> registration open</label>
-      <label><input id="a-trd" type="checkbox" ${s.trading_open ? "checked" : ""}> trading open</label>
-      <button id="a-save">Save</button></div>
-      <p class="dim" style="margin:0">Close trading before the round starts: live data is stored under the current round.</p></div>
-    <div class="box"><h2>Add bonus</h2><div class="row">
+  const state = s.registration_open ? "registration open" : s.trading_open ? "trading open" : "round running";
+  return `<h1>Admin</h1><p class="sub">${seasonLabel()}${isCur() ? "" : ` · viewing an old season, contest controls act on season ${s.current_season}`}</p>
+    <div class="card"><h2>Contest</h2>
+      <div class="row"><span class="figure">Season ${s.current_season} · Round ${s.current_round}</span><span class="muted">${state}</span></div>
+      <div class="row"><button class="btn primary" id="a-next">Start round ${s.current_round + 1}</button><button class="btn" id="a-season">New season</button></div>
+      <div class="row">
+        <label class="check"><input id="a-reg" type="checkbox" ${s.registration_open ? "checked" : ""}>Registration open</label>
+        <label class="check"><input id="a-trd" type="checkbox" ${s.trading_open ? "checked" : ""}>Trading open</label>
+        <span class="muted">Round</span><input id="a-round" type="number" min="1" value="${s.current_round}" style="width:80px">
+        <button class="btn" id="a-save">Save</button></div>
+      <p class="note">Starting a round opens trading. Close it before the siege starts, new captures are saved to the current round</p></div>
+    <div class="card"><h2>Bonus points</h2><div class="row">
       <select id="b-player">${opts}</select>
-      <input id="b-round" type="number" min="1" value="${s.current_round}" style="width:80px" title="round">
-      <input id="b-pts" type="number" value="10" style="width:80px" title="points">
-      <input id="b-why" placeholder="reason (e.g. first 10-0, new tech)" style="flex:1;min-width:160px">
-      <button class="primary" id="b-add">Add</button></div>
-      <table>${D.bonuses.slice().sort((a, b) => b.id - a.id).map((b) =>
-        `<tr><td>R${b.round_no}</td><td>${esc(b.player)}</td><td class="n">${b.points > 0 ? "+" : ""}${b.points}</td><td class="dim">${esc(b.reason)}</td><td class="n"><button data-del="${b.id}">×</button></td></tr>`).join("")}</table></div>
-    ${viewAccounts(R)}
-    <div class="box"><h2>Name swap</h2><div class="row">
-      <select id="s-a">${opts}</select> ⇄ <select id="s-b">${opts}</select>
-      <input id="s-round" type="number" min="1" value="${s.current_round}" style="width:80px" title="round">
-      <button class="primary" id="s-add">Swap stats</button></div>
-      <table>${D.round_swaps.map((w) => `<tr><td>R${w.round_no}</td><td>${esc(w.player_a)} ⇄ ${esc(w.player_b)}</td><td class="n"><button data-sdel="${w.id}">×</button></td></tr>`).join("")}</table></div>
-    <div class="box"><h2>People (Discord IDs)</h2><div class="row">
-      <input id="u-id" placeholder="Discord user ID" style="width:200px"><input id="u-name" placeholder="display name" style="width:160px">
-      <label><input id="u-adm" type="checkbox"> admin</label><button class="primary" id="u-add">Add / update</button></div>
-      <table>${allowedUsers.map((u) => `<tr><td>${esc(u.label)}</td><td class="dim">${esc(u.discord_id)}</td><td>${u.is_admin ? '<span class="good">admin</span>' : ""}</td><td class="n"><button data-udel="${esc(u.discord_id)}">×</button></td></tr>`).join("")}</table></div>`;
+      <input id="b-round" type="number" min="1" value="${viewRound()}" style="width:80px" aria-label="Round">
+      <input id="b-pts" type="number" value="10" style="width:80px" aria-label="Points">
+      <input id="b-why" placeholder="Reason" style="flex:1;min-width:160px">
+      <button class="btn primary" id="b-add">Add</button></div>
+      ${D.bonuses.length ? `<table>${D.bonuses.slice().sort((a, b) => b.id - a.id).map((b) =>
+        `<tr><td class="num muted rank">R${b.round_no}</td><td>${esc(b.player)}</td><td class="n">${b.points > 0 ? "+" : ""}${b.points}</td><td class="dim">${esc(b.reason)}</td><td class="n"><button class="icon-btn" data-del="${b.id}" aria-label="Remove bonus">${ICON.x}</button></td></tr>`).join("")}</table>` : ""}</div>
+    ${viewAccounts()}
+    <div class="card"><h2>Name swap</h2><div class="row">
+      <select id="s-a">${opts}</select><span class="muted">with</span><select id="s-b">${opts}</select>
+      <input id="s-round" type="number" min="1" value="${viewRound()}" style="width:80px" aria-label="Round">
+      <button class="btn primary" id="s-add">Swap stats</button></div>
+      ${D.round_swaps.length ? `<table>${D.round_swaps.map((w) => `<tr><td class="num muted rank">R${w.round_no}</td><td>${esc(w.player_a)} <span class="muted">with</span> ${esc(w.player_b)}</td><td class="n"><button class="icon-btn" data-sdel="${w.id}" aria-label="Remove swap">${ICON.x}</button></td></tr>`).join("")}</table>` : ""}</div>
+    <div class="card"><h2>People</h2><div class="row">
+      <input id="u-id" placeholder="Discord user ID" style="width:200px"><input id="u-name" placeholder="Display name" style="width:160px">
+      <label class="check"><input id="u-adm" type="checkbox">Admin</label><button class="btn primary" id="u-add">Add or update</button></div>
+      <table>${allowedUsers.map((u) => `<tr><td>${esc(u.label)}</td><td class="num muted hide-s">${esc(u.discord_id)}</td><td>${u.is_admin ? '<span class="dim">Admin</span>' : ""}</td><td class="n"><button class="icon-btn" data-udel="${esc(u.discord_id)}" aria-label="Remove person">${ICON.x}</button></td></tr>`).join("")}</table></div>`;
 }
 
 function bindAdmin() {
+  const s = D.settings;
   const run = async (p, ok) => { const { error } = await p; if (error) return toast(error.message, true); toast(ok); load(); };
-  $("a-save").onclick = () => run(sb.from("settings").update({
-    current_round: +$("a-round").value, registration_open: $("a-reg").checked, trading_open: $("a-trd").checked }).eq("id", 1), "Saved");
+  const settings = (patch, ok) => run(sb.from("settings").update(patch).eq("id", 1), ok);
+  $("a-next").onclick = () => settings({ current_round: s.current_round + 1, registration_open: false, trading_open: true },
+    `Round ${s.current_round + 1} started · trading open`);
+  $("a-season").onclick = () => {
+    const next = s.current_season + 1;
+    if (!confirm(`Start season ${next}? Teams start fresh with registration open. Season ${s.current_season} stays viewable.`)) return;
+    season = next;
+    settings({ current_season: next, current_round: 1, registration_open: true, trading_open: false }, `Season ${next} started · registration open`);
+  };
+  $("a-save").onclick = () => settings({ current_round: +$("a-round").value, registration_open: $("a-reg").checked, trading_open: $("a-trd").checked }, "Saved");
   $("b-add").onclick = () => run(sb.from("bonuses").insert({
-    player: $("b-player").value, round_no: +$("b-round").value, points: +$("b-pts").value, reason: $("b-why").value }), "Bonus added");
+    season, player: $("b-player").value, round_no: +$("b-round").value, points: +$("b-pts").value, reason: $("b-why").value }), "Bonus added");
   $("u-add").onclick = () => run(sb.from("allowed_users").upsert({
     discord_id: $("u-id").value.trim(), label: $("u-name").value.trim(), is_admin: $("u-adm").checked }), "Saved");
   document.querySelectorAll("[data-del]").forEach((b) => b.onclick = () => run(sb.from("bonuses").delete().eq("id", b.dataset.del), "Removed"));
@@ -276,17 +413,18 @@ function bindAdmin() {
   const map = (id, player) => run(player
     ? sb.from("wizard_map").upsert({ wizard_id: id, player })
     : sb.from("wizard_map").delete().eq("wizard_id", id), player ? `Mapped to ${player}` : "Mapping removed");
-  document.querySelectorAll("[data-map]").forEach((s) => s.onchange = () => map(s.dataset.map, s.value));
+  document.querySelectorAll("[data-map]").forEach((el) => el.onchange = () => map(el.dataset.map, el.value));
   document.querySelectorAll("[data-sug]").forEach((b) => b.onclick = () => map(b.dataset.sug, b.dataset.p));
   $("s-add").onclick = () => run(sb.from("round_swaps").insert({
-    round_no: +$("s-round").value, player_a: $("s-a").value, player_b: $("s-b").value }), "Swap added");
+    season, round_no: +$("s-round").value, player_a: $("s-a").value, player_b: $("s-b").value }), "Swap added");
   document.querySelectorAll("[data-sdel]").forEach((b) => b.onclick = () => run(sb.from("round_swaps").delete().eq("id", b.dataset.sdel), "Swap removed"));
 }
 
+// ---------- start ----------
 let t;
 const reload = () => { clearTimeout(t); t = setTimeout(load, 250); };
 const ch = sb.channel("contest");
-TABLES.forEach((table) => ch.on("postgres_changes", { event: "*", schema: "public", table }, reload));
+[...SCOPED, ...GLOBAL, "settings"].forEach((table) => ch.on("postgres_changes", { event: "*", schema: "public", table }, reload));
 ch.subscribe();
 // A failed login comes back as ?error_description=… (or in the #hash); show it instead of silently doing nothing.
 const loginError = new URLSearchParams(location.search + "&" + location.hash.slice(1)).get("error_description");
