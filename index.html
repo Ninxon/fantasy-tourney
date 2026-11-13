@@ -106,10 +106,9 @@ async function load() {
   render();
 }
 
-async function loadMe() {
+async function loadMe(session) {
   const { data } = await sb.rpc("whoami");
   me = data || { allowed: false, admin: false, owner: null };
-  const { data: { session } } = await sb.auth.getSession();
   loggedIn = !!session;
   const meta = session && session.user.user_metadata;
   $("who").textContent = meta ? meta.global_name || meta.username || meta.full_name || meta.name || "" : "";
@@ -289,8 +288,9 @@ ch.subscribe();
 // A failed login comes back as ?error_description=… (or in the #hash); show it instead of silently doing nothing.
 const loginError = new URLSearchParams(location.search + "&" + location.hash.slice(1)).get("error_description");
 if (loginError) setTimeout(() => toast("Login failed: " + loginError, true), 300);
-sb.auth.onAuthStateChange(() => loadMe().then(load));
-loadMe().then(load);
+// Fires once on page load (INITIAL_SESSION) and on every login/logout. Supabase calls made directly inside
+// this callback deadlock the auth lock, so the work is deferred with setTimeout.
+sb.auth.onAuthStateChange((_event, session) => setTimeout(() => loadMe(session).then(load), 0));
 </script>
 </body>
 </html>
