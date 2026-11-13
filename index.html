@@ -69,7 +69,10 @@
 <script src="config.js"></script>
 <script src="scoring.js"></script>
 <script>
-const sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+// No cross-tab auth lock: one stuck tab must never freeze every other tab of the site.
+const sb = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY, {
+  auth: { lock: (_name, _timeout, fn) => fn() },
+});
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const TABLES = ["players", "rounds", "teams", "roster_history", "bonuses", "settings", "wizard_map", "round_swaps"];
