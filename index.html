@@ -286,6 +286,9 @@ const reload = () => { clearTimeout(t); t = setTimeout(load, 250); };
 const ch = sb.channel("contest");
 TABLES.forEach((table) => ch.on("postgres_changes", { event: "*", schema: "public", table }, reload));
 ch.subscribe();
+// A failed login comes back as ?error_description=… (or in the #hash); show it instead of silently doing nothing.
+const loginError = new URLSearchParams(location.search + "&" + location.hash.slice(1)).get("error_description");
+if (loginError) setTimeout(() => toast("Login failed: " + loginError, true), 300);
 sb.auth.onAuthStateChange(() => loadMe().then(load));
 loadMe().then(load);
 </script>
